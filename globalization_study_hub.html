@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globalization Study Hub</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;color:#182235}
+header{background:linear-gradient(135deg,#172554,#2563eb);color:white;padding:28px 18px;text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(28px,6vw,46px)}
+header p{margin:0;opacity:.9}
+nav{position:sticky;top:0;z-index:10;background:white;box-shadow:0 2px 10px #0001;display:flex;gap:8px;padding:10px;overflow:auto}
+nav button{border:0;background:#e8eef9;padding:10px 14px;border-radius:999px;white-space:nowrap;cursor:pointer;font-weight:bold}
+nav button.active,nav button:hover{background:#2563eb;color:white}
+main{max-width:1100px;margin:auto;padding:20px}
+section{display:none}.active-section{display:block}
+.card{background:white;border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 4px 18px #1e3a8a12}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.term{border-left:5px solid #2563eb}
+.term h3{margin-top:0;color:#1d4ed8}
+.flashcard{min-height:260px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;background:linear-gradient(135deg,#fff,#edf4ff)}
+.flashcard h2{font-size:30px}.flashcard p{font-size:20px;line-height:1.5}
+.hidden{display:none}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+button.action{background:#2563eb;color:white;border:0;border-radius:10px;padding:11px 16px;cursor:pointer;font-weight:bold}
+button.secondary{background:#e5e7eb;color:#111827}
+.progress{height:10px;background:#dbe3f0;border-radius:20px;overflow:hidden}.progress div{height:100%;background:#2563eb;width:0}
+.question{font-size:21px;font-weight:bold}.option{display:block;width:100%;text-align:left;margin:9px 0;padding:13px;border:2px solid #dbe3f0;background:white;border-radius:10px;cursor:pointer}.option:hover{border-color:#2563eb}.correct{border-color:#16a34a!important;background:#dcfce7!important}.wrong{border-color:#dc2626!important;background:#fee2e2!important}
+.score{font-size:24px;font-weight:bold}
+.small{color:#64748b;font-size:14px}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{padding:12px;border-bottom:1px solid #e5e7eb;text-align:left}th{background:#eff6ff}
+.tip{background:#fff7ed;border-left:5px solid #f97316}
+footer{text-align:center;color:#64748b;padding:30px}
+</style>
+</head>
+<body>
+<header>
+<h1>🌎 Globalization Study Hub</h1>
+<p>Flashcards • Quizzes • Study strategies • Quick review</p>
+</header>
+
+<nav>
+<button class="active" onclick="show('home',this)">🏠 Home</button>
+<button onclick="show('flash',this)">🃏 Flashcards</button>
+<button onclick="show('quiz',this)">🧠 Quiz</button>
+<button onclick="show('terms',this)">📚 Terms</button>
+<button onclick="show('strategies',this)">🎯 Strategies</button>
+</nav>
+
+<main>
+<section id="home" class="active-section">
+<div class="card">
+<h2>How to study</h2>
+<p>Start with the flashcards, then take the quiz without looking at your notes. If you miss something, review that term and try again.</p>
+<div class="grid">
+<div class="card term"><h3>🃏 Flashcards</h3><p>Click a card to reveal the answer. Use the buttons to move through the deck.</p></div>
+<div class="card term"><h3>🧠 Quiz</h3><p>Test yourself with multiple-choice questions.</p></div>
+<div class="card term"><h3>🔗 Connections</h3><p>Think about how trade, technology, culture, politics and the environment connect.</p></div>
+</div>
+</div>
+<div class="card tip"><h2>💡 Quick memory trick</h2><p><b>Economic = money</b> • <b>Political = government</b> • <b>Social = people/culture</b> • <b>Environmental = nature</b></p></div>
+</section>
+
+<section id="flash">
+<div class="card">
+<h2>🃏 Flashcards</h2>
+<p class="small">Click the card to flip it.</p>
+<div class="progress"><div id="bar"></div></div>
+<div id="flashcard" class="card flashcard" onclick="flip()"></div>
+<div class="controls">
+<button class="action secondary" onclick="prevCard()">← Previous</button>
+<button class="action" onclick="nextCard()">Next →</button>
+<button class="action secondary" onclick="shuffle()">🔀 Shuffle</button>
+</div>
+<p id="counter" class="small"></p>
+</div>
+</section>
+
+<section id="quiz">
+<div class="card">
+<h2>🧠 Practice Quiz</h2>
+<p id="qnum"></p>
+<div id="quizbox"></div>
+<div class="controls">
+<button id="nextq" class="action" onclick="nextQuestion()" style="display:none">Next question →</button>
+<button class="action secondary" onclick="restartQuiz()">Restart</button>
+</div>
+<div class="score" id="score"></div>
+</div>
+</section>
+
+<section id="terms">
+<h2>📚 Key Terms</h2>
+<div class="grid" id="termgrid"></div>
+</section>
+
+<section id="strategies">
+<div class="card">
+<h2>🎯 Study Strategies</h2>
+<h3>1. Active recall</h3><p>Hide the definition and try to explain the term from memory before checking the answer.</p>
+<h3>2. Spaced repetition</h3><p>Review the same terms over several days instead of studying everything once.</p>
+<h3>3. Teach it</h3><p>Explain globalization out loud as if you were teaching a friend. If you get stuck, that topic needs more review.</p>
+<h3>4. Make connections</h3><p>Example: A phone can connect people through communication technology, depend on international trade, and affect the economy.</p>
+<h3>5. Compare terms</h3><p>For similar terms, write one sentence explaining the difference. This is especially useful for assimilation, acculturation, affirmation, integration and marginalization.</p>
+<h3>6. Four-dimension check</h3>
+<table><tr><th>Dimension</th><th>Think about...</th></tr>
+<tr><td>Economic</td><td>Money, jobs, businesses, trade and markets</td></tr>
+<tr><td>Political</td><td>Governments, laws, decisions and international relationships</td></tr>
+<tr><td>Social</td><td>People, culture, language, identity and communities</td></tr>
+<tr><td>Environmental</td><td>Natural resources, pollution, climate and ecosystems</td></tr>
+</table>
+</div>
+</section>
+</main>
+<footer>Globalization Study Hub • Made for studying 📖</footer>
+
+<script>
+const cards=[
+["Interconnected","Connected to or linked with other people, places, systems or events."],
+["Interdependence","When people, countries or systems depend on one another."],
+["Forces of Globalization","Factors that help increase connections between places, including trade, transportation, communication technology and media."],
+["Trade","The buying and selling or exchange of goods and services between people, businesses or countries."],
+["Transportation","The movement of people and goods from one place to another. Faster transportation can increase global connections."],
+["Communication Technology","Technology that allows information to be shared quickly across distances, such as phones and the internet."],
+["Media","Ways information and entertainment are communicated to large audiences, such as television, radio, websites and social media."],
+["Economic Globalization","Global connections involving trade, businesses, jobs, money, production and markets."],
+["Political Globalization","Connections between governments and countries involving laws, decisions, cooperation and international organizations."],
+["Social Globalization","The spread and exchange of ideas, culture, language, lifestyles and relationships between people."],
+["Environmental Globalization","The way environmental issues and resources cross borders and affect countries and people around the world."],
+["National Identity","A sense of belonging to a country and its shared history, symbols, values and culture."],
+["Regional Identity","A sense of belonging connected to a particular region or local area within or across a country."],
+["Assimilation","When a person or group adopts the culture of another group, often losing or reducing parts of their original culture."],
+["Affirmation","Supporting, recognizing or strengthening a person's or group's identity and culture."],
+["Acculturation","The process of learning or adopting parts of another culture while aspects of the original culture may remain."],
+["Homogenization","The process in which differences between cultures become smaller, making cultures more similar."],
+["Integration","When a person or group participates in a larger society while maintaining parts of their own identity and culture."],
+["Marginalization","When a person or group is pushed toward the edge of society and has less access to opportunities, influence or participation."],
+["Economic Exploitation","Using people, labour or resources unfairly for economic gain, especially when one group benefits while another receives unfair treatment."],
+["CRTC","The Canadian Radio-television and Telecommunications Commission. It regulates and supervises parts of Canada's broadcasting and telecommunications systems."],
+["CBC","The Canadian Broadcasting Corporation, Canada's public broadcaster. Its purpose includes providing Canadian news, information, culture and entertainment through broadcasting and digital services."],
+["Individual Identity","The qualities, beliefs, experiences, values and characteristics that make a person unique."],
+["Collective Identity","The shared sense of belonging that connects a group of people through things such as culture, language, history, values or traditions."],
+["Transnational Corporation","A company that operates in more than one country and has business activities across national borders."],
+["Ethnocentrism","Judging another culture using the standards and beliefs of your own culture, often viewing your own culture as the normal or superior one."],
+["Universalization","The spread of ideas, products, practices or values so they become common or recognized around the world."],
+["Americanization","The influence or spread of American culture, products, values, media or ways of life to other countries."],
+["Economies of Scale","The reduction in the average cost of producing something when production increases, often because costs can be spread over more products."],
+["Hybridization","The blending of elements from different cultures to create something new."],
+["Cultural Revitalization","Efforts to strengthen, restore or bring back a culture, language, traditions or identity that has been weakened or threatened."],
+["Media Convergence","The combining of different types of media and communication technologies onto the same platforms or devices."],
+["Multiculturalism","The recognition and acceptance of multiple cultures within the same society."],
+["Labor Loss","The loss or reduction of jobs or employment opportunities, which can happen when work moves elsewhere, industries change or technology replaces certain jobs."],
+["Economic Development","Improvements in a country's or community's economic well-being, such as better jobs, income, infrastructure and access to opportunities."],
+["Non-Governmental Organization (NGO)","An organization that is independent from government and works to address social, environmental, humanitarian or other public issues."],
+["Human Rights","Basic rights and freedoms that belong to all people, such as equality, safety, freedom and dignity."]
+];
+
+let idx=0,showAnswer=false;
+function renderCard(){
+ const c=cards[idx];
+ document.getElementById("flashcard").innerHTML=showAnswer?`<div><p class="small">${c[0]}</p><p>${c[1]}</p></div>`:`<div><h2>${c[0]}</h2><p class="small">Click to reveal</p></div>`;
+ document.getElementById("counter").textContent=`Card ${idx+1} of ${cards.length}`;
+ document.getElementById("bar").style.width=((idx+1)/cards.length*100)+"%";
+}
+function flip(){showAnswer=!showAnswer;renderCard()}
+function nextCard(){idx=(idx+1)%cards.length;showAnswer=false;renderCard()}
+function prevCard(){idx=(idx-1+cards.length)%cards.length;showAnswer=false;renderCard()}
+function shuffle(){cards.sort(()=>Math.random()-.5);idx=0;showAnswer=false;renderCard()}
+renderCard();
+
+document.getElementById("termgrid").innerHTML=cards.map(c=>`<div class="card term"><h3>${c[0]}</h3><p>${c[1]}</p></div>`).join("");
+
+const questions=[
+["What does interdependence mean?",["Countries never need each other.","People or countries depend on one another.","A country becomes completely isolated.","Cultures become identical."],1],
+["Which is a force of globalization?",["Trade","Gravity","Sleep","Local weather"],0],
+["Which dimension is mainly about money, jobs and trade?",["Social","Environmental","Economic","Political"],2],
+["Which dimension focuses on governments and laws?",["Political","Economic","Social","Environmental"],0],
+["Which dimension includes culture and identity?",["Economic","Social","Political","Environmental"],1],
+["Which dimension includes pollution and natural resources?",["Social","Economic","Environmental","Political"],2],
+["What is assimilation?",["Keeping all cultural practices unchanged","Adopting another culture, often with reduced original cultural practices","Only learning a new language","Trading with another country"],1],
+["What is acculturation?",["Learning or adopting parts of another culture while some original culture may remain","Being excluded from society","Making all cultures identical","A type of transportation"],0],
+["What is integration?",["Participating in a larger society while maintaining parts of one's identity","Being pushed out of society","Completely abandoning a culture","Stopping international trade"],0],
+["What is marginalization?",["Having more political power","Being pushed toward the edge of society with fewer opportunities or participation","Cultural celebration","International trade"],1],
+["What does the CRTC regulate and supervise?",["Only schools","Parts of broadcasting and telecommunications in Canada","Canadian parks","International borders"],1],
+["What is CBC?",["A private airline","Canada's public broadcaster","A transportation company","A political party"],1]
+];
+let qi=0,points=0,answered=false;
+function renderQuiz(){
+ if(qi>=questions.length){
+  document.getElementById("quizbox").innerHTML=`<h2>Quiz complete! 🎉</h2><p>You got <b>${points}/${questions.length}</b>.</p>`;
+  document.getElementById("qnum").textContent="Finished";
+  document.getElementById("nextq").style.display="none";
+  document.getElementById("score").textContent=points>=9?"Great work — review the ones you missed!":points>=6?"Good start — review the flashcards and try again.":"Keep practicing — the flashcards can help.";
+  return;
+ }
+ answered=false;
+ const q=questions[qi];
+ document.getElementById("qnum").textContent=`Question ${qi+1} of ${questions.length}`;
+ document.getElementById("score").textContent=`Score: ${points}`;
+ document.getElementById("nextq").style.display="none";
+ document.getElementById("quizbox").innerHTML=`<div class="question">${q[0]}</div>`+q[1].map((x,i)=>`<button class="option" onclick="answer(${i})">${x}</button>`).join("");
+}
+function answer(i){
+ if(answered)return; answered=true;
+ const q=questions[qi], opts=document.querySelectorAll(".option");
+ opts[q[2]].classList.add("correct");
+ if(i===q[2])points++; else opts[i].classList.add("wrong");
+ document.getElementById("score").textContent=`Score: ${points}`;
+ document.getElementById("nextq").style.display="inline-block";
+}
+function nextQuestion(){qi++;renderQuiz()}
+function restartQuiz(){qi=0;points=0;renderQuiz()}
+renderQuiz();
+
+function show(id,btn){
+ document.querySelectorAll("section").forEach(s=>s.classList.remove("active-section"));
+ document.getElementById(id).classList.add("active-section");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>
